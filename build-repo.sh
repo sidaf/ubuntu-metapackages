@@ -17,6 +17,16 @@ if ! (dpkg -l | grep -iq debsigs); then
   exit 1
 fi
 
+if ! (dpkg -l | grep -iq apt-utils); then
+  echo "[!] The 'apt-utils' package does not appear to be installed, quitting..."
+  exit 1
+fi
+
+if ! (gpg --list-keys $PUBLIC_KEY >/dev/null 2>&1); then
+  echo "[!] The public key '$PUBLIC_KEY' does not appear to exist, quitting..."
+  exit 1
+fi
+
 echo "[*] Creating directory structure ..."
 mkdir -p dists/$DIST/main/binary-{i386,amd64}
 mkdir -p pool
