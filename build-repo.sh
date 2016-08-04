@@ -3,6 +3,7 @@
 ## START CONFIG ##
 
 PUBLIC_KEY="CAE172DB"
+DIST="ubuntu"
 
 ## END CONFIG ##
 
@@ -17,7 +18,7 @@ if ! (dpkg -l | grep -iq debsigs); then
 fi
 
 echo "[*] Creating directory structure ..."
-mkdir -p dists/kali/main/binary-{i386,amd64}
+mkdir -p dists/$DIST/main/binary-{i386,amd64}
 mkdir -p pool
 
 if test -n "$(find ./equivs/ -maxdepth 1 -name '*.cfg' -print -quit)"; then
@@ -42,10 +43,10 @@ if test -n "$(find ./pool/ -maxdepth 1 -name '*.deb' -print -quit)"; then
   done
 
   echo "[*] Generating Packages and Packages.gz files ..."
-  apt-ftparchive --arch i386 packages ./pool/ /dev/null pool | tee dists/kali/main/binary-i386/Packages | gzip > dists/kali/main/binary-i386/Packages.gz
-  apt-ftparchive --arch amd64 packages ./pool/ /dev/null pool | tee dists/kali/main/binary-amd64/Packages | gzip > dists/kali/main/binary-amd64/Packages.gz
+  apt-ftparchive --arch i386 packages ./pool/ /dev/null pool | tee dists/$DIST/main/binary-i386/Packages | gzip > dists/$DIST/main/binary-i386/Packages.gz
+  apt-ftparchive --arch amd64 packages ./pool/ /dev/null pool | tee dists/$DIST/main/binary-amd64/Packages | gzip > dists/$DIST/main/binary-amd64/Packages.gz
 
-  cd dists/kali
+  cd dists/$DIST
 
   echo "[*] Generating the Release file ..."
   apt-ftparchive release . > Release
@@ -59,12 +60,12 @@ if test -n "$(find ./pool/ -maxdepth 1 -name '*.deb' -print -quit)"; then
   cd ../../
 
   echo "[*] Exporting the gpg public key for the repository to a file ..."
-  gpg --armor --export CAE172DB > repository.key
+  gpg --armor --export $PUBLIC_KEY > repository.key
 
   echo ""
   echo "[+] Run the following command to enable this repostory on the local system:"
   echo ""
-  echo "echo \"deb file://$(pwd) kali main\" > /etc/apt/sources.list.d/local.list"
+  echo "echo \"deb file://$(pwd) $DIST main\" > /etc/apt/sources.list.d/local.list"
   echo ""
   echo "[+] Import the repository public GPG key:"
   echo ""
